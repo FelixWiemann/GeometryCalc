@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">VectorDraw</string>
+    <string name="ERROR_CONVERTING_VECTOR_TO_POINT">The dimension of the vector has to be 2</string>
+    <string name="ERROR_DRAW_TRIANGLE_INVALID_ARGUMENTS">The amount of vectors is not correct</string>
 </resources>
