@@ -15,6 +15,7 @@ import com.nepumuk.geocalc.VectorN;
  */
 public class cVector extends VectorN {
 		// nobody needs colored shit if he doesn't want to draw them
+		// therefore I introduce a class that extends the VectorN class and is able to hold the colors.
 		public static int ColorStandard = Color.BLACK;
 		public static Paint.Style PaintStyleStandard = Paint.Style.STROKE;
 		public static Paint.Join PaintJoinStandard = Paint.Join.ROUND;
