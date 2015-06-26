@@ -22,29 +22,143 @@ import java.util.ArrayList;
 
 
 /**
+ * Created by Felix "nepumuk" Wiemann on 16.04.2015.
+ *
+ * @author Felix "nepumuk" Wiemann
+ * @version 0.1
  *
  */
-@TargetApi(Build.VERSION_CODES.CUPCAKE)
+@TargetApi(Build.VERSION_CODES.FROYO)
 public class VectorDrawView extends ImageView implements GestureDetector.OnGestureListener, View.OnTouchListener,
 		GestureDetector.OnDoubleTapListener {
-	private ScaleGestureDetector mScaleDetector;
+	private static final String ERROR_CONVERTING_VECTOR_TO_POINT = String.valueOf(R.string.ERROR_CONVERTING_VECTOR_TO_POINT);
+	private static final String ERROR_DRAW_TRIANGLE_INVALID_ARGUMENTS = String.valueOf(R.string.ERROR_DRAW_TRIANGLE_INVALID_ARGUMENTS);
 	private static float mScaleFactor = 1.f;
-	private Context ct;
-	private static class ScaleListener
-			extends ScaleGestureDetector.SimpleOnScaleGestureListener {
-		@Override
-		public boolean onScale(ScaleGestureDetector detector) {
-			mScaleFactor *= detector.getScaleFactor();
-			tm = touchMode.Null;
-			// Don't let the object get too small or too large.
-			mScaleFactor = Math.max(0.1f, Math.min(mScaleFactor, 5.0f));
-
-
-			return true;
-		}
-	}
 	private static cVector cVector2 = new cVector(0, 0);
 	private static touchMode tm = touchMode.Null;
+	/**
+	 * origin of the drawing
+	 */
+	public double[] zero;
+	float mPreviousX;
+/*
+	private void HandleUserInteractionDoubleFinger(MotionEvent event) {
+		multituch=true;
+		try{
+		float x1 = event.getX(0);
+		float x2 = event.getX(1);
+		float prevx1 = event.getHistoricalX(0,1);
+		float prevx2 = event.getHistoricalX(1,1);
+		float prevy1 = event.getHistoricalX(0,1);
+		float prevy2 = event.getHistoricalX(1,1);
+		float y1 = event.getX(0);
+		float y2 = event.getX(1);
+		float zoomDif=1;
+
+		if (y1-y2<50)
+		{
+			zoomDif = (prevx1-x1)-(prevx2-x2);
+			zoomFactor = zoomDif/100;
+		}}
+		catch (Exception e){}
+		if (event.getActionIndex()==event.ACTION_UP){multituch=false;}
+	}*/
+float mPreviousY;
+	float rotationFactor = (float) (Math.PI / 100);
+	Canvas GraphicsVectorDraw;
+	Bitmap bitMapGraphics;
+	private ScaleGestureDetector mScaleDetector;
+	private Context ct;
+	private int mActivePointerId;
+	private double[] BitMapSize = new double[2];
+	// definition of the axis
+	private cVector xAxis = new cVector(new double[]{100, 0, 0}, Color.BLACK);
+	private cVector yAxis = new cVector(new double[]{0, -100, 0}, Color.BLACK);
+	private cVector zAxis = new cVector(new double[]{0, 0, 100}, Color.BLACK);
+	// colors
+	private int backgroundColor = Color.WHITE;
+	// some factors
+	private double plainZFactor;
+	private float AxisSize = 10f;
+	private ArrayList<cVector> VectorAsPoint = new ArrayList<>();
+	private ArrayList<cVector> VectorAsLine = new ArrayList<>();
+
+
+	// TODO onSizeChanged, Zoom, create error logs& save them for each try&catch,
+	// make sure, every function has its own description and is fully commented
+	//create different bitmaps, draw them parallel, display them at once
+	private ArrayList<cVector[]> VectorsAsTriangles = new ArrayList<>();
+	private ArrayList<cVector[]> VectorAsQuader = new ArrayList<>();
+
+	public VectorDrawView(Context context, AttributeSet attrs, int defStyle) {
+		super(context, attrs, defStyle);
+		init(attrs, defStyle);
+	}
+
+	@SuppressWarnings("all")
+	private void init(AttributeSet attrs, int defStyle) {
+		// Load attributes
+		final TypedArray a = getContext().obtainStyledAttributes(
+				attrs, R.styleable.VectorDrawView, defStyle, 0);
+
+		/*mExampleString = a.getString(
+				R.styleable.VectorDrawView_exampleString);
+		mExampleColor = a.getColor(
+				R.styleable.VectorDrawView_exampleColor,
+				mExampleColor);
+		// Use getDimensionPixelSize or getDimensionPixelOffset when dealing with
+		// values that should fall on pixel boundaries.
+		mExampleDimension = a.getDimension(
+				R.styleable.VectorDrawView_exampleDimension,
+				mExampleDimension);
+
+		if (a.hasValue(R.styleable.VectorDrawView_exampleDrawable)) {
+			mExampleDrawable = a.getDrawable(
+					R.styleable.VectorDrawView_exampleDrawable);
+			mExampleDrawable.setCallback(this);
+		}
+
+		a.recycle();
+
+		// Set up a default TextPaint object
+		mTextPaint = new TextPaint();
+		mTextPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
+		mTextPaint.setTextAlign(Paint.Align.LEFT);
+
+		// Update TextPaint and text measurements from attributes
+		invalidateTextPaintAndMeasurements();
+	}
+
+	private void invalidateTextPaintAndMeasurements() {
+		mTextPaint.setTextSize(mExampleDimension);
+		mTextPaint.setColor(mExampleColor);
+		mTextWidth = mTextPaint.measureText(mExampleString);
+
+		Paint.FontMetrics fontMetrics = mTextPaint.getFontMetrics();
+		mTextHeight = fontMetrics.bottom;*/
+	}
+
+	// todo: after zoom/move center drawVectorAsLine new
+
+	/**
+	 * @param context context
+	 */
+	public VectorDrawView(Context context) {
+		super(context);
+		init(null, 0);
+		Initialize();
+
+	}
+
+	/**
+	 * @param context context
+	 * @param attrs   attributes
+	 */
+	public VectorDrawView(Context context, AttributeSet attrs) {
+		super(context, attrs);
+		init(attrs, 0);
+		Initialize();
+	}
 
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
@@ -72,28 +186,6 @@ public class VectorDrawView extends ImageView implements GestureDetector.OnGestu
 		return true;
 
 	}
-/*
-	private void HandleUserInteractionDoubleFinger(MotionEvent event) {
-		multituch=true;
-		try{
-		float x1 = event.getX(0);
-		float x2 = event.getX(1);
-		float prevx1 = event.getHistoricalX(0,1);
-		float prevx2 = event.getHistoricalX(1,1);
-		float prevy1 = event.getHistoricalX(0,1);
-		float prevy2 = event.getHistoricalX(1,1);
-		float y1 = event.getX(0);
-		float y2 = event.getX(1);
-		float zoomDif=1;
-
-		if (y1-y2<50)
-		{
-			zoomDif = (prevx1-x1)-(prevx2-x2);
-			zoomFactor = zoomDif/100;
-		}}
-		catch (Exception e){}
-		if (event.getActionIndex()==event.ACTION_UP){multituch=false;}
-	}*/
 
 	@Override
 	public boolean onSingleTapConfirmed(MotionEvent e) {
@@ -140,16 +232,14 @@ public class VectorDrawView extends ImageView implements GestureDetector.OnGestu
 		return false;
 	}
 
-
-	private void makeToast(String message) {
-		Toast.makeText(ct, message, Toast.LENGTH_SHORT).show();
-	}
-
 	public void context(Context c) {
 		ct = c;
 		makeToast("context set");
 	}
 
+	private void makeToast(String message) {
+		Toast.makeText(ct, message, Toast.LENGTH_SHORT).show();
+	}
 
 	private void HandleUserInteractionSingleFinger(MotionEvent event) {
 
@@ -279,54 +369,6 @@ public class VectorDrawView extends ImageView implements GestureDetector.OnGestu
 		reDraw();
 	}
 
-	public VectorDrawView(Context context, AttributeSet attrs, int defStyle) {
-		super(context, attrs, defStyle);
-		init(attrs, defStyle);
-	}
-
-	@SuppressWarnings("all")
-	private void init(AttributeSet attrs, int defStyle) {
-		// Load attributes
-		final TypedArray a = getContext().obtainStyledAttributes(
-				attrs, R.styleable.VectorDrawView, defStyle, 0);
-
-		/*mExampleString = a.getString(
-				R.styleable.VectorDrawView_exampleString);
-		mExampleColor = a.getColor(
-				R.styleable.VectorDrawView_exampleColor,
-				mExampleColor);
-		// Use getDimensionPixelSize or getDimensionPixelOffset when dealing with
-		// values that should fall on pixel boundaries.
-		mExampleDimension = a.getDimension(
-				R.styleable.VectorDrawView_exampleDimension,
-				mExampleDimension);
-
-		if (a.hasValue(R.styleable.VectorDrawView_exampleDrawable)) {
-			mExampleDrawable = a.getDrawable(
-					R.styleable.VectorDrawView_exampleDrawable);
-			mExampleDrawable.setCallback(this);
-		}
-
-		a.recycle();
-
-		// Set up a default TextPaint object
-		mTextPaint = new TextPaint();
-		mTextPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
-		mTextPaint.setTextAlign(Paint.Align.LEFT);
-
-		// Update TextPaint and text measurements from attributes
-		invalidateTextPaintAndMeasurements();
-	}
-
-	private void invalidateTextPaintAndMeasurements() {
-		mTextPaint.setTextSize(mExampleDimension);
-		mTextPaint.setColor(mExampleColor);
-		mTextWidth = mTextPaint.measureText(mExampleString);
-
-		Paint.FontMetrics fontMetrics = mTextPaint.getFontMetrics();
-		mTextHeight = fontMetrics.bottom;*/
-	}
-
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
@@ -337,15 +379,8 @@ public class VectorDrawView extends ImageView implements GestureDetector.OnGestu
 		return false;
 	}
 
-
-	// TODO onSizeChanged, Zoom, create error logs& save them for each try&catch,
-	// make sure, every function has its own description and is fully commented
-	//create different bitmaps, draw them parallel, display them at once
-
-	private enum touchMode {
-		RotateX, Move, Zoom, RotateY, Null
-	}
-	private int mActivePointerId;
+	// TODO implement zooming private String ERROR_ZOOM_FACTOR_VALUE =
+	// "The value of the zoom factor can't be zero or less.";
 
 	/**
 	 * initialize VectorDraw, automatically done after creating it
@@ -386,86 +421,6 @@ public class VectorDrawView extends ImageView implements GestureDetector.OnGestu
 	}
 
 	/**
-	 * origin of the drawing
-	 */
-	public double[] zero;
-
-	// todo: after zoom/move center drawVectorAsLine new
-
-	private double[] BitMapSize = new double[2];
-	// definition of the axis
-	private cVector xAxis = new cVector(new double[]{100, 0, 0}, Color.BLACK);
-	private cVector yAxis = new cVector(new double[]{0, -100, 0}, Color.BLACK);
-	private cVector zAxis = new cVector(new double[]{0, 0, 100}, Color.BLACK);
-	// colors
-	private int backgroundColor = Color.WHITE;
-	// some factors
-	private double plainZFactor;
-
-
-	private float AxisSize = 10f;
-	float mPreviousX;
-	float mPreviousY;
-
-	float rotationFactor = (float) (Math.PI / 100);
-
-	private ArrayList<cVector> VectorAsPoint = new ArrayList<>();
-	private ArrayList<cVector> VectorAsLine = new ArrayList<>();
-	private ArrayList<cVector[]> VectorsAsTriangles = new ArrayList<>();
-	private ArrayList<cVector[]> VectorAsQuader = new ArrayList<>();
-
-	Canvas GraphicsVectorDraw;
-	Bitmap bitMapGraphics;
-
-	private static final String ERROR_CONVERTING_VECTOR_TO_POINT = String.valueOf(R.string.ERROR_CONVERTING_VECTOR_TO_POINT);
-
-	// TODO implement zooming private String ERROR_ZOOM_FACTOR_VALUE =
-	// "The value of the zoom factor can't be zero or less.";
-
-	private static final String ERROR_DRAW_TRIANGLE_INVALID_ARGUMENTS = String.valueOf(R.string.ERROR_DRAW_TRIANGLE_INVALID_ARGUMENTS);
-
-
-	/**
-	 * @param context context
-	 */
-	public VectorDrawView(Context context) {
-		super(context);
-		init(null, 0);
-		Initialize();
-
-	}
-
-	/**
-	 * @param context context
-	 * @param attrs   attributes
-	 */
-	public VectorDrawView(Context context, AttributeSet attrs) {
-		super(context, attrs);
-		init(attrs, 0);
-		Initialize();
-	}
-
-	/**
-	 * Adds a point to the vectordraw that automatically gets redrawn when zoom and the central
-	 * point is changed
-	 *
-	 * @param v Vector that defines the point
-	 */
-	public void addPointToDrawing(cVector v) {
-		VectorAsPoint.add(v);
-	}
-
-	/**
-	 * Adds a line to the vectordraw that automatically gets redrawn when zoom and the central point
-	 * is changed
-	 *
-	 * @param v Vector that defines the Line of the Vector
-	 */
-	public void addVectorAsLineToDrawing(cVector v) {
-		VectorAsLine.add(v);
-	}
-
-	/**
 	 * @param vs vectors describing the cube
 	 */
 	@SuppressWarnings("unused")
@@ -483,7 +438,6 @@ public class VectorDrawView extends ImageView implements GestureDetector.OnGestu
 	public void addVectorAsTriangle(cVector[] vs) {
 		VectorsAsTriangles.add(vs);
 	}
-
 
 	/**
 	 * @throws Exception
@@ -613,19 +567,6 @@ public class VectorDrawView extends ImageView implements GestureDetector.OnGestu
 	}
 
 	/**
-	 * draw a Line between the two points p1 and p2
-	 *
-	 * @param Pen defines the drawing pen
-	 * @param p1  starting point
-	 * @param p2  ending point
-	 */
-	private void DrawLine(Paint Pen, double[] p1, double[] p2) {
-		GraphicsVectorDraw.drawLine((float) p1[0], (float) p1[1],
-				(float) p2[0], (float) p2[1], Pen);
-		this.setImageBitmap(bitMapGraphics);
-	}
-
-	/**
 	 * draws a line between the ends of the given vectors
 	 *
 	 * @param v1 start point
@@ -640,8 +581,8 @@ public class VectorDrawView extends ImageView implements GestureDetector.OnGestu
 	/**
 	 * Draws a line between the ends of two vectors
 	 *
-	 * @param v1 vector 1
-	 * @param v2 vector 2
+	 * @param v1 VectorN 1
+	 * @param v2 VectorN 2
 	 * @param p  paint
 	 * @throws Exception
 	 */
@@ -651,6 +592,73 @@ public class VectorDrawView extends ImageView implements GestureDetector.OnGestu
 		// TODO implement paint
 		this.DrawLine(p, VectorToPoint(plainVectorOnZ(v1)),
 				VectorToPoint(plainVectorOnZ(v2)));
+	}
+
+	/**
+	 * draw a Line between the two points p1 and p2
+	 *
+	 * @param Pen defines the drawing pen
+	 * @param p1  starting point
+	 * @param p2  ending point
+	 */
+	private void DrawLine(Paint Pen, double[] p1, double[] p2) {
+		GraphicsVectorDraw.drawLine((float) p1[0], (float) p1[1],
+				(float) p2[0], (float) p2[1], Pen);
+		this.setImageBitmap(bitMapGraphics);
+	}
+
+	/**
+	 * @param v
+	 * @return
+	 * @throws Exception
+	 */
+
+	@SuppressWarnings("all")
+	public double[] VectorToPoint(VectorN v) throws Exception {
+		if (v.getDimension() == 2) {
+			double[] da = {(v.getComponents()[0] + zero[0]),
+					(v.getComponents()[1] + zero[1])};
+			return da;
+		} else {
+			throw new Exception(ERROR_CONVERTING_VECTOR_TO_POINT);
+		}
+	}
+
+	/**
+	 * projects a 3D vector on a 2D vector, that can be drawn in VectorDraw
+	 *
+	 * @param v Vector to be plained
+	 * @return plained vector
+	 */
+	private VectorN plainVectorOnZ(VectorN v) {
+		double[] ds = v.getComponents();
+		double dz = ds[2];
+		// plain
+		double d[];
+		d = plainZ(dz);
+		double dx = ds[0] - d[0] / 2;
+		double dy = ds[1] + d[1] / 2;
+		d[0] = dx;
+		d[1] = dy;
+		return new VectorN(dx, dy);
+		//cVector2.setComponents(d);
+		//return cVector2;
+	}
+
+	/**
+	 * converts z value to x and y value
+	 *
+	 * @param z
+	 * @return
+	 */
+
+	@SuppressWarnings("all")
+	private double[] plainZ(double z) {
+		double x, y;
+		x = Math.sin(plainZFactor) * z;
+		y = Math.cos(plainZFactor) * z;
+		double[] d = {x, y};
+		return d;
 	}
 
 	/**
@@ -798,7 +806,7 @@ public class VectorDrawView extends ImageView implements GestureDetector.OnGestu
 		// make sure, every vector is drawn
 		try {
 			for (cVector vector : vectors) {
-				cVector v = new cVector(plainVectorOnZ(VectorN.multiply(vector, mScaleFactor)), vector.getvPaintColor());
+				cVector v = new cVector(plainVectorOnZ(VectorN.multiply(vector, mScaleFactor)), cVector.getvPaintColor());
 
 				// finally drawVectorAsLine it
 				this.DrawLine(v.getvPaint(), zero, VectorToPoint(v));
@@ -829,7 +837,6 @@ public class VectorDrawView extends ImageView implements GestureDetector.OnGestu
 
 	}
 
-
 	@SuppressWarnings("unused")
 	public void getAxisPen() {
 		// TODO
@@ -842,6 +849,14 @@ public class VectorDrawView extends ImageView implements GestureDetector.OnGestu
 	}
 
 	/**
+	 * @param axisSize the axisSize to set
+	 */
+	@SuppressWarnings("unused")
+	public void setAxisSize(float axisSize) {
+		AxisSize = axisSize;
+	}
+
+	/**
 	 * @return the bitMapGraphics
 	 */
 	@SuppressWarnings("unused")
@@ -849,11 +864,26 @@ public class VectorDrawView extends ImageView implements GestureDetector.OnGestu
 		return bitMapGraphics;
 	}
 
+	/**
+	 * @param bitMapGraphics the bitMapGraphics to set
+	 */
+	@SuppressWarnings("unused")
+	public void setBitMapGraphics(Bitmap bitMapGraphics) {
+		this.bitMapGraphics = bitMapGraphics;
+	}
+
 	@SuppressWarnings("unused")
 	public Canvas getGraphicsVectorDraw() {
 		return GraphicsVectorDraw;
 	}
 
+	/**
+	 * @param graphicsVectorDraw the graphicsVectorDraw to set
+	 */
+	@SuppressWarnings("unused")
+	public void setGraphicsVectorDraw(Canvas graphicsVectorDraw) {
+		GraphicsVectorDraw = graphicsVectorDraw;
+	}
 
 	/**
 	 * Add points to drawing. They get redrawn everytime zoom, rotation and/or position of zero
@@ -869,13 +899,22 @@ public class VectorDrawView extends ImageView implements GestureDetector.OnGestu
 	}
 
 	/**
+	 * Adds a point to the vectordraw that automatically gets redrawn when zoom and the central
+	 * point is changed
+	 *
+	 * @param v Vector that defines the point
+	 */
+	public void addPointToDrawing(cVector v) {
+		VectorAsPoint.add(v);
+	}
+
+	/**
 	 * reset the VectorDraw to it's default values
 	 */
 	@SuppressWarnings("unused")
 	public void Refresh() {
 		Initialize();
 	}
-
 
 	/**
 	 * Adds a lines to the VectorDrawView that automatically gets redrawn when zoom and the central
@@ -888,6 +927,16 @@ public class VectorDrawView extends ImageView implements GestureDetector.OnGestu
 		for (cVector v : vs) {
 			addVectorAsLineToDrawing(v);
 		}
+	}
+
+	/**
+	 * Adds a line to the vectordraw that automatically gets redrawn when zoom and the central point
+	 * is changed
+	 *
+	 * @param v Vector that defines the Line of the Vector
+	 */
+	public void addVectorAsLineToDrawing(cVector v) {
+		VectorAsLine.add(v);
 	}
 
 	/**
@@ -909,43 +958,6 @@ public class VectorDrawView extends ImageView implements GestureDetector.OnGestu
 			e.printStackTrace();
 			throw new Exception(e.getMessage());
 		}
-	}
-
-	/**
-	 * projects a 3D vector on a 2D vector, that can be drawn in VectorDraw
-	 *
-	 * @param v Vector to be plained
-	 * @return plained vector
-	 */
-	private VectorN plainVectorOnZ(VectorN v) {
-		double[] ds = v.getComponents();
-		double dz = ds[2];
-		// plain
-		double d[];
-		d = plainZ(dz);
-		double dx = ds[0] - d[0] / 2;
-		double dy = ds[1] + d[1] / 2;
-		d[0] = dx;
-		d[1] = dy;
-		return new VectorN(dx, dy);
-		//cVector2.setComponents(d);
-		//return cVector2;
-	}
-
-	/**
-	 * converts z value to x and y value
-	 *
-	 * @param z
-	 * @return
-	 */
-
-	@SuppressWarnings("all")
-	private double[] plainZ(double z) {
-		double x, y;
-		x = Math.sin(plainZFactor) * z;
-		y = Math.cos(plainZFactor) * z;
-		double[] d = {x, y};
-		return d;
 	}
 
 	/**
@@ -1006,30 +1018,6 @@ public class VectorDrawView extends ImageView implements GestureDetector.OnGestu
 	}
 
 	/**
-	 * @param axisSize the axisSize to set
-	 */
-	@SuppressWarnings("unused")
-	public void setAxisSize(float axisSize) {
-		AxisSize = axisSize;
-	}
-
-	/**
-	 * @param bitMapGraphics the bitMapGraphics to set
-	 */
-	@SuppressWarnings("unused")
-	public void setBitMapGraphics(Bitmap bitMapGraphics) {
-		this.bitMapGraphics = bitMapGraphics;
-	}
-
-	/**
-	 * @param graphicsVectorDraw the graphicsVectorDraw to set
-	 */
-	@SuppressWarnings("unused")
-	public void setGraphicsVectorDraw(Canvas graphicsVectorDraw) {
-		GraphicsVectorDraw = graphicsVectorDraw;
-	}
-
-	/**
 	 *
 	 */
 	public void test() {
@@ -1040,20 +1028,20 @@ public class VectorDrawView extends ImageView implements GestureDetector.OnGestu
 		this.draw(GraphicsVectorDraw);
 	}
 
-	/**
-	 * @param v
-	 * @return
-	 * @throws Exception
-	 */
+	private enum touchMode {
+		RotateX, Move, Zoom, RotateY, Null
+	}
+	private static class ScaleListener
+			extends ScaleGestureDetector.SimpleOnScaleGestureListener {
+		@Override
+		public boolean onScale(ScaleGestureDetector detector) {
+			mScaleFactor *= detector.getScaleFactor();
+			tm = touchMode.Null;
+			// Don't let the object get too small or too large.
+			mScaleFactor = Math.max(0.1f, Math.min(mScaleFactor, 5.0f));
 
-	@SuppressWarnings("all")
-	public double[] VectorToPoint(VectorN v) throws Exception {
-		if (v.getDimension() == 2) {
-			double[] da = {(v.getComponents()[0] + zero[0]),
-					(v.getComponents()[1] + zero[1])};
-			return da;
-		} else {
-			throw new Exception(ERROR_CONVERTING_VECTOR_TO_POINT);
+
+			return true;
 		}
 	}
 

@@ -4,6 +4,7 @@ package com.nepumuk.vectordraw;
 import android.graphics.Color;
 import android.graphics.Paint;
 
+import com.nepumuk.geocalc.Vector;
 import com.nepumuk.geocalc.VectorN;
 
 
@@ -13,9 +14,9 @@ import com.nepumuk.geocalc.VectorN;
  * @author Felix "nepumuk" Wiemann
  * @version 0.1
  */
-public class cVector extends VectorN {
+public class cVector extends VectorN implements Vector {
 	// nobody needs colored shit if he doesn't want to draw them
-	// therefore I introduce a class that extends the VectorN class and is able to hold the colors.
+	// therefore I introduce a class that extends the Vector class and is able to hold the colors.
 	public static int ColorStandard = Color.BLACK;
 	public static Paint.Style PaintStyleStandard = Paint.Style.STROKE;
 	public static Paint.Join PaintJoinStandard = Paint.Join.ROUND;
@@ -36,7 +37,7 @@ public class cVector extends VectorN {
 		}
 	};
 
-	private int vPaintColor;
+	private static int vPaintColor;
 	private Paint.Style vPaintStyle;
 	private Paint.Join vPaintStrokeJoin;
 	private Paint.Cap vPaintStrokeCap;
@@ -52,12 +53,41 @@ public class cVector extends VectorN {
 		this.vPaint = v.getvPaint();
 	}
 
+	/**
+	 * @return the vColor
+	 */
+	public Paint getvPaint() {
+		return vPaint;
+	}
+
 	@SuppressWarnings("unused")
 	public cVector(cVector v, int Color) {
 		super(v);
 		this.changePaintColor(Color);
 	}
 
+	/**
+	 * @param Color Color to change to
+	 */
+	public void changePaintColor(int Color) {
+
+		vPaint.setColor(Color);
+
+	}
+
+
+	/*public cVector(double x, double y, double z) {
+		super(x, y, z);
+		initPaint();
+		this.changePaintColor(Color);
+
+	}
+/*
+	public cVector(double x, double y, int Color) {
+		super(x, y);
+		initPaint();
+		this.changePaintColor(Color);
+	}*/
 	@SuppressWarnings("unused")
 	public cVector(double x, double y) {
 		super(x, y);
@@ -66,14 +96,25 @@ public class cVector extends VectorN {
 	}
 
 	/**
+	 * initialize the Paint the vector can be drawn with
+	 */
+	private void initPaint() {
+		vPaint = new Paint();
+		vPaint.setAntiAlias(cVector.PaintAntiAliasStandard);
+		vPaint.setDither(cVector.PaintDitherStandard);
+		vPaint.setColor(cVector.ColorStandard);
+		vPaint.setStyle(cVector.PaintStyleStandard);
+		vPaint.setStrokeJoin(cVector.PaintJoinStandard);
+		vPaint.setStrokeCap(cVector.PaintCapStandard);
+		vPaint.setStrokeWidth(cVector.PaintStrokeWidthStandard);
+	}
+
+	/**
 	 * constructor of an vector with three dimensions x,y,z
 	 *
-	 * @param x
-	 *            x-value
-	 * @param y
-	 *            y-value
-	 * @param z
-	 *            z-value
+	 * @param x x-value
+	 * @param y y-value
+	 * @param z z-value
 	 */
 	@SuppressWarnings("unused")
 	public cVector(double x, double y, double z) {
@@ -82,28 +123,6 @@ public class cVector extends VectorN {
 
 	}
 
-	/**
-	 * constructor of an vector with three dimensions x,y,z
-	 *
-	 * @param x
-	 *            x-value
-	 * @param y
-	 *            y-value
-	 * @param z
-	 *            z-value
-	 */
-	/*public cVector(double x, double y, double z) {
-		super(x, y, z);
-		initPaint();
-		this.changePaintColor(Color);
-
-	}*/
-/*
-	public cVector(double x, double y, int Color) {
-		super(x, y);
-		initPaint();
-		this.changePaintColor(Color);
-	}*/
 
 	/**
 	 * constructor with an array of values
@@ -142,7 +161,6 @@ public class cVector extends VectorN {
 
 	}
 
-
 	public cVector(int dim, int Color) {
 		super(dim);
 		initPaint();
@@ -162,48 +180,9 @@ public class cVector extends VectorN {
 	}
 
 	/**
-	 * @param Color Color to change to
-	 */
-	public void changePaintColor(int Color) {
-
-		vPaint.setColor(Color);
-
-	}
-
-	/**
 	 * @return the vColor
 	 */
-	public Paint getvPaint() {
-		return vPaint;
-	}
-
-	/**
-	 * initialize the Paint the vector can be drawn with
-	 */
-	private void initPaint() {
-		vPaint = new Paint();
-		vPaint.setAntiAlias(cVector.PaintAntiAliasStandard);
-		vPaint.setDither(cVector.PaintDitherStandard);
-		vPaint.setColor(cVector.ColorStandard);
-		vPaint.setStyle(cVector.PaintStyleStandard);
-		vPaint.setStrokeJoin(cVector.PaintJoinStandard);
-		vPaint.setStrokeCap(cVector.PaintCapStandard);
-		vPaint.setStrokeWidth(cVector.PaintStrokeWidthStandard);
-	}
-
-	/**
-	 * @param vColor
-	 *            the vColor to set
-	 */
-	@SuppressWarnings("unused")
-	public void setvColor(Paint vColor) {
-		this.vPaint = vColor;
-	}
-
-	/**
-	 * @return the vColor
-	 */
-	public int getvPaintColor() {
+	public static int getvPaintColor() {
 		return vPaintColor;
 	}
 
@@ -214,6 +193,15 @@ public class cVector extends VectorN {
 	@SuppressWarnings("unused")
 	public void setvPaintColor(int vColor) {
 		this.vPaintColor = vColor;
+	}
+
+	/**
+	 * @param vColor
+	 *            the vColor to set
+	 */
+	@SuppressWarnings("unused")
+	public void setvColor(Paint vColor) {
+		this.vPaint = vColor;
 	}
 
 	/**
