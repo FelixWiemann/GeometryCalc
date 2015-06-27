@@ -46,15 +46,15 @@ public interface Vector {
 	String toString();
 
 	// is smaller or equals TODO
-	Boolean IsUnitVector(VectorN v);
+	Boolean IsUnitVector(Vector v);
 
-	boolean compareIdentical(VectorN v1, VectorN v2);
+	boolean compareIdentical(Vector v1, Vector v2);
 
-	boolean compareIdentical(VectorN v1, VectorN v2, double tolerance);
+	boolean compareIdentical(Vector v1, Vector v2, double tolerance);
 
-	double getDistance(VectorN v1, VectorN v2) throws Exception;
+	double getDistance(Vector v1, Vector v2) throws Exception;
 
-	double getLength(VectorN vector);
+	double getLength(Vector vector);
 
 	double getValue(int index);
 
@@ -62,69 +62,37 @@ public interface Vector {
 
 	double SumSquaredComponents();
 
-	double SumSquaredComponents(VectorN vector);
+	double SumSquaredComponents(Vector vector);
 
-	double SumComponents(VectorN vector);
+	double SumComponents(Vector vector);
 
 	String toString(String form, String separator);
 
-	Vector rotateAroundVector(Vector VectorToRotate,
-							  Vector AxisVector, double degrees) throws Exception;
+	Vector increment(Vector v) throws Exception;
 
-	Vector increment(VectorN v) throws Exception;
+	Vector getUnitVector(Vector vector);
 
-	Vector rotateAroundX(Vector vector, double degrees_around_x)
-			throws Exception;
+	Vector multiply(Vector v, double d);
 
-	Vector rotateAroundY(Vector vector, double degrees_around_y)
-			throws Exception;
+	Vector Normalize(Vector vector) throws Exception;
 
-	Vector rotateAroundZ(Vector vector, double degrees_around_z)
-			throws Exception;
+	Vector subtract(Vector v1, Vector v2) throws Exception;
 
-	Vector getUnitVector(VectorN vector);
+	Vector decrement(Vector v) throws Exception;
 
-	Vector rotateAroundZ(VectorN vector, double degrees) throws Exception;
+	Vector divide(Vector v, double d);
 
-	Vector multiply(VectorN v, double d);
+	Vector add(Vector v1, Vector v2) throws Exception;
 
-	Vector Normalize(VectorN vector) throws Exception;
+	Vector multiply(double d, Vector v);
 
-	Vector subtract(VectorN v1, VectorN v2) throws Exception;
-
-	Vector decrement(VectorN v) throws Exception;
-
-	Vector divide(VectorN v, double d);
-
-	Vector add(VectorN v1, VectorN v2) throws Exception;
-
-	Vector multiply(double d, VectorN v);
-
-	Vector negate(VectorN v) throws Exception;
-
-	Vector[] rotateAroundX(VectorN[] vs, double degrees) throws Exception;
-
-	Vector[] rotateAroundY(VectorN[] vs, double degrees) throws Exception;
-
-	Vector[] rotateAroundZ(VectorN[] vs, double degrees) throws Exception;
+	Vector negate(Vector v) throws Exception;
 
 	Vector stringToVector(String String, String form, String separator);
-
-	void rotateAroundVector(VectorN AxisVector, double degrees)
-			throws Exception;
 
 	void setValue(int index, double newValue);
 
 	void Normalize() throws Exception;
-
-	void rotateAroundVector(Vector AxisVector, double degrees)
-			throws Exception;
-
-	void rotateAroundX(double degrees_around_x) throws Exception;
-
-	void rotateAroundY(double degrees_around_y) throws Exception;
-
-	void rotateAroundZ(double degrees) throws Exception;
 
 	void setComponents(double x, double y, double z);
 

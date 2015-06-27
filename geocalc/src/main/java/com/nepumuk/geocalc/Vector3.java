@@ -24,10 +24,11 @@ public class Vector3 implements Vector {
 	 */
 	public final static Vector3 origin = new Vector3(0, 0, 0);
 	private static final int dimension = 3;
-	private double x_Value;
-	private double y_Value;
-	private double z_Value;
-	private double length;
+	private static Vector3 CalcResult = new Vector3(0, 0, 0);
+	protected double x_Value;
+	protected double y_Value;
+	protected double z_Value;
+	protected double length;
 
 	/**
 	 * constructor of a vector with three dimensions x,y,z
@@ -43,6 +44,63 @@ public class Vector3 implements Vector {
 		length=this.getLength();
 	}
 
+	public Vector3(Vector3 v) {
+		this.x_Value = v.getValue(0);
+		this.y_Value = v.getValue(1);
+		this.z_Value = v.getValue(2);
+		this.calculateLength();
+	}
+
+	private void calculateLength() {
+		this.length = Math.sqrt(this.SumSquaredComponents());
+	}
+
+	public static Vector3 add(Vector3 v1, Vector3 v2) throws Exception {
+		return null;
+	}
+
+	public static Vector3 multiply(double d, Vector3 v) {
+		return null;
+	}
+
+	public static Vector3 multiply(Vector3 v, double d) {
+		return null;
+	}
+
+	public Vector3 rotateAroundZ(Vector3 vector, double degrees)
+			throws Exception {
+		//TODO optimize, evaluate whether rotation matrix is better
+
+		/* comments see rotateAroundX */
+		if (vector.getDimension() == 3) {
+			double[] resvals, vecvals;
+			resvals = CalcResult.getComponents();
+			vecvals = vector.getComponents();
+			resvals[0] = Math.cos(degrees) * vecvals[0] - Math.sin(degrees)
+					* vecvals[1];
+			resvals[1] = Math.sin(degrees) * vecvals[0] + Math.cos(degrees)
+					* vecvals[1];
+			resvals[2] = vecvals[2];
+			CalcResult.setComponents(resvals);
+			return CalcResult;
+		} else {
+			/* able to rotate around z if it has only two dimensions */
+			if (vector.getDimension() == 2) {
+				double[] resvals, vecvals;
+				resvals = CalcResult.getComponents();
+				vecvals = vector.getComponents();
+				resvals[0] = Math.cos(degrees) * vecvals[0] - Math.sin(degrees)
+						* vecvals[1];
+				resvals[1] = Math.sin(degrees) * vecvals[0] + Math.cos(degrees)
+						* vecvals[1];
+				CalcResult.setComponents(resvals);
+				return CalcResult;
+			} else {
+				throw exROTATE_ERROR_TOO_MUCH_DIMENSIONS;
+			}
+		}
+	}
+
 	@Override
 	public double[] getComponents() {
 		return new double[]{x_Value, y_Value, z_Value};
@@ -54,10 +112,6 @@ public class Vector3 implements Vector {
 		y_Value = value[1];
 		z_Value = value[2];
 		calculateLength();
-	}
-
-	private void calculateLength() {
-		this.length = Math.sqrt(this.SumSquaredComponents());
 	}
 
 	@Override
@@ -87,27 +141,27 @@ public class Vector3 implements Vector {
 	}
 
 	@Override
-	public Boolean IsUnitVector(VectorN v) {
+	public Boolean IsUnitVector(Vector v) {
 		return null;
 	}
 
 	@Override
-	public boolean compareIdentical(VectorN v1, VectorN v2) {
+	public boolean compareIdentical(Vector v1, Vector v2) {
 		return false;
 	}
 
 	@Override
-	public boolean compareIdentical(VectorN v1, VectorN v2, double tolerance) {
+	public boolean compareIdentical(Vector v1, Vector v2, double tolerance) {
 		return false;
 	}
 
 	@Override
-	public double getDistance(VectorN v1, VectorN v2) throws Exception {
+	public double getDistance(Vector v1, Vector v2) throws Exception {
 		return 0;
 	}
 
 	@Override
-	public double getLength(VectorN vector) {
+	public double getLength(Vector vector) {
 		return 0;
 	}
 
@@ -137,12 +191,12 @@ public class Vector3 implements Vector {
 	}
 
 	@Override
-	public double SumSquaredComponents(VectorN vector) {
+	public double SumSquaredComponents(Vector vector) {
 		return 0;
 	}
 
 	@Override
-	public double SumComponents(VectorN vector) {
+	public double SumComponents(Vector vector) {
 		return 0;
 	}
 
@@ -151,22 +205,101 @@ public class Vector3 implements Vector {
 		return null;
 	}
 
+	@Override
+	public Vector increment(Vector v) throws Exception {
+		return null;
+	}
+
+	@Override
+	public Vector getUnitVector(Vector vector) {
+		return null;
+	}
+
+	@Override
+	public Vector3 multiply(Vector v, double d) {
+		return null;
+	}
+
+	@Override
+	public Vector Normalize(Vector vector) throws Exception {
+		return null;
+	}
+
+	@Override
+	public Vector subtract(Vector v1, Vector v2) throws Exception {
+		return null;
+	}
+
+	@Override
+	public Vector decrement(Vector v) throws Exception {
+		return null;
+	}
+
+	@Override
+	public Vector divide(Vector v, double d) {
+		return null;
+	}
+
+	@Override
+	public Vector add(Vector v1, Vector v2) throws Exception {
+		return null;
+	}
+
+	@Override
+	public Vector multiply(double d, Vector v) {
+		return null;
+	}
+
+	@Override
+	public Vector negate(Vector v) throws Exception {
+		return null;
+	}
+
+	@Override
+	public Vector3 stringToVector(String String, String form, String separator) {
+		return null;
+	}
+
+	@Override
+	public void setValue(int index, double newValue) {
+
+	}
+
+	@Override
+	public void Normalize() throws Exception {
+		x_Value /= length;
+		y_Value /= length;
+		z_Value /= length;
+		length = 1;
+	}
+
+	@Override
+	public void setComponents(double x, double y, double z) {
+
+	}
+
+	public Vector3[] rotateAroundZ(Vector3[] vs, double degrees) throws Exception {
+		return new Vector3[0];
+	}
+
+	public void rotateAroundVector(Vector3 AxisVector, double degrees) throws Exception {
+		double[] values = rotateAroundVector(this, AxisVector, degrees).getComponents();
+		x_Value = values[0];
+		y_Value = values[1];
+		z_Value = values[2];
+	}
+
 	/**
-	 * rotates a Vector around an axis described by another vector with a number
-	 * of degrees
+	 * rotates a Vector around an axis described by another vector with a number of degrees
 	 *
-	 * @param VectorToRotate
-	 *            Vector to rotate
-	 * @param AxisVector
-	 *            vector describing the axis to rotate around
-	 * @param degrees
-	 *            amount of degrees that shall be rotated
+	 * @param VectorToRotate Vector to rotate
+	 * @param AxisVector     vector describing the axis to rotate around
+	 * @param degrees        amount of degrees that shall be rotated
 	 * @return rotated vector
 	 * @throws Exception
 	 */
-	@Override
-	public Vector rotateAroundVector(Vector VectorToRotate,
-									 Vector AxisVector, double degrees) throws Exception {
+	public Vector3 rotateAroundVector(Vector3 VectorToRotate,
+									  Vector3 AxisVector, double degrees) throws Exception {
 		/*
 		 * TODO optimize, evaluate whether rotation matrix is better
 		 * goal: axis
@@ -220,30 +353,55 @@ public class Vector3 implements Vector {
 		return VectorToRotate;
 	}
 
-	@Override
-	public Vector increment(VectorN v) throws Exception {
-		return null;
+	public void rotateAroundY(double degrees_around_y) throws Exception {
+
+	}
+
+	public void rotateAroundX(double degrees_around_x) throws Exception {
+
+	}
+
+	public void rotateAroundZ(double degrees) throws Exception {
+
+	}
+
+	/**
+	 * rotate all 3D vectors around the x axis
+	 *
+	 * @param vs      vectors to rotate
+	 * @param degrees amount of degrees that shall be rotated
+	 * @return rotated vectors
+	 * @throws Exception
+	 */
+	public Vector3[] rotateAroundX(Vector3[] vs, double degrees)
+			throws Exception {
+		//TODO optimize, evaluate whether rotation matrix is better
+
+		for (int i = 0; i < vs.length; ) {
+			/* rotate each vector separately */
+			vs[i] = rotateAroundX(vs[i], degrees);
+			i++;
+		}
+		return vs;
 	}
 
 	/**
 	 * rotate a 3D vector around the x axis
 	 *
-	 * @param vector
-	 *            vector to rotate
-	 * @param degrees_around_x
-	 *            amount of degrees that shall be rotated
+	 * @param vector           vector to rotate
+	 * @param degrees_around_x amount of degrees that shall be rotated
 	 * @return rotated vector
 	 * @throws Exception
 	 */
-	@Override
-	public Vector rotateAroundX(Vector vector, double degrees_around_x)
+
+	public Vector3 rotateAroundX(Vector3 vector, double degrees_around_x)
 			throws Exception {
 		//TODO optimize, evaluate whether rotation matrix is better
 		/* check whether it is a 3 dimensional vector */
 		if (vector.getDimension() == 3) {
 			/* create solution vector, to be sure everything is fine */
 			double[] resvals, vecvals;
-			resvals = CalcResultDim3.getComponents();
+			resvals = CalcResult.getComponents();
 			vecvals = vector.getComponents();
 			/* x value stays the same */
 			resvals[0] = vecvals[0];
@@ -253,26 +411,47 @@ public class Vector3 implements Vector {
 			/* y value is calculated with sin*y_value+cos*z_value */
 			resvals[2] = Math.cos(degrees_around_x) * vecvals[2]
 					+ Math.sin(degrees_around_x) * vecvals[1];
-			CalcResultDim3.setComponents(resvals);
+			CalcResult.setComponents(resvals);
 			/* return result */
-			return CalcResultDim3;
+			return CalcResult;
 		} else {
 			/* if not, BAM */
 			throw exROTATE_ERROR_TOO_MUCH_DIMENSIONS;
 		}
 	}
+
+	/**
+	 * rotate all 3D vector around the y axis
+	 *
+	 * @param vs
+	 *            vectors to rotate
+	 * @param degrees
+	 *            amount of degrees that shall be rotated
+	 * @return rotated vectors
+	 * @throws Exception
+	 */
+	public Vector3[] rotateAroundY(Vector3[] vs, double degrees)
+			throws Exception {
+		//TODO optimize, evaluate whether rotation matrix is better
+
+		for (int i = 0; i < vs.length; ) {
+			/* rotate each vector individually */
+			vs[i] = rotateAroundY(vs[i], degrees);
+			i++;
+		}
+		return vs;
+	}
+
 	/**
 	 * rotate a 3D vector around the y axis
 	 *
-	 * @param vector
-	 *            vector to rotate
-	 * @param degrees_around_y
-	 *            amount of degrees that shall be rotated
+	 * @param vector           vector to rotate
+	 * @param degrees_around_y amount of degrees that shall be rotated
 	 * @return rotated vector
 	 * @throws Exception
 	 */
-	@Override
-	public VectorN rotateAroundY(Vector vector, double degrees_around_y)
+
+	public Vector3 rotateAroundY(Vector3 vector, double degrees_around_y)
 			throws Exception {
 		//TODO optimize, evaluate whether rotation matrix is better
 
@@ -282,171 +461,43 @@ public class Vector3 implements Vector {
 		 */
 		if (vector.getDimension() == 3) {
 			double[] resvals, vecvals;
-			resvals = CalcResultDim3.getComponents();
+			resvals = CalcResult.getComponents();
 			vecvals = vector.getComponents();
 			resvals[0] = Math.sin(degrees_around_y) * vecvals[2]
 					+ Math.cos(degrees_around_y) * vecvals[0];
 			resvals[1] = vecvals[1];
 			resvals[2] = Math.cos(degrees_around_y) * vecvals[2]
 					- Math.sin(degrees_around_y) * vecvals[0];
-			CalcResultDim3.setComponents(resvals);
-			return CalcResultDim3;
+			CalcResult.setComponents(resvals);
+			return CalcResult;
 		} else {
 			// if not, BAM
 			throw exROTATE_ERROR_TOO_MUCH_DIMENSIONS;
 		}
 	}
 
-
-	@Override
-	public Vector rotateAroundZ(Vector vector, double degrees)
+	/**
+	 * TODO
+	 * rotate all 3D vectors around the z axis
+	 *
+	 * @param vs
+	 *            vectors to rotate
+	 * @param degrees
+	 *            amount of degrees that shall be rotated
+	 * @return rotated vectors
+	 * @throws Exception
+	 */
+	/*public VectorN[] rotateAroundZ(VectorN[] vs, double degrees)
 			throws Exception {
 		//TODO optimize, evaluate whether rotation matrix is better
 
-		/* comments see rotateAroundX */
-		if (vector.getDimension() == 3) {
-			double[] resvals, vecvals;
-			resvals = CalcResultDim3.getComponents();
-			vecvals = vector.getComponents();
-			resvals[0] = Math.cos(degrees) * vecvals[0] - Math.sin(degrees)
-					* vecvals[1];
-			resvals[1] = Math.sin(degrees) * vecvals[0] + Math.cos(degrees)
-					* vecvals[1];
-			resvals[2] = vecvals[2];
-			CalcResultDim3.setComponents(resvals);
-			return CalcResultDim3;
-		} else {
-			/* able to rotate around z if it has only two dimensions */
-			if (vector.getDimension() == 2) {
-				double[] resvals, vecvals;
-				resvals = CalcResultDim3.getComponents();
-				vecvals = vector.getComponents();
-				resvals[0] = Math.cos(degrees) * vecvals[0] - Math.sin(degrees)
-						* vecvals[1];
-				resvals[1] = Math.sin(degrees) * vecvals[0] + Math.cos(degrees)
-						* vecvals[1];
-				CalcResultDim3.setComponents(resvals);
-				return CalcResultDim3;
-			} else {
-				throw exROTATE_ERROR_TOO_MUCH_DIMENSIONS;
-			}
+		/* rotate each vector individually
+		for (int i = 0; i < vs.length; ) {
+			vs[i] = VectorN.rotateAroundZ(vs[i], degrees);
+			i++;
 		}
-	}
-
-	@Override
-	public Vector getUnitVector(VectorN vector) {
-		return null;
-	}
-
-	@Override
-	public Vector rotateAroundZ(VectorN vector, double degrees) throws Exception {
-		return null;
-	}
-
-	@Override
-	public Vector multiply(VectorN v, double d) {
-		return null;
-	}
-
-	@Override
-	public Vector Normalize(VectorN vector) throws Exception {
-		return null;
-	}
-
-	@Override
-	public Vector subtract(VectorN v1, VectorN v2) throws Exception {
-		return null;
-	}
-
-	@Override
-	public Vector decrement(VectorN v) throws Exception {
-		return null;
-	}
-
-	@Override
-	public Vector divide(VectorN v, double d) {
-		return null;
-	}
-
-	@Override
-	public Vector add(VectorN v1, VectorN v2) throws Exception {
-		return null;
-	}
-
-	@Override
-	public Vector multiply(double d, VectorN v) {
-		return null;
-	}
-
-	@Override
-	public Vector negate(VectorN v) throws Exception {
-		return null;
-	}
-
-	@Override
-	public Vector[] rotateAroundX(VectorN[] vs, double degrees) throws Exception {
-		return new Vector[0];
-	}
-
-	@Override
-	public Vector[] rotateAroundY(VectorN[] vs, double degrees) throws Exception {
-		return new Vector[0];
-	}
-
-	@Override
-	public Vector[] rotateAroundZ(VectorN[] vs, double degrees) throws Exception {
-		return new Vector[0];
-	}
-
-	@Override
-	public Vector stringToVector(String String, String form, String separator) {
-		return null;
-	}
-
-	@Override
-	public void rotateAroundVector(VectorN AxisVector, double degrees) throws Exception {
-
-	}
-
-}
-
-	@Override
-	public void setValue(int index, double newValue) {
-
-	}
-
-	@Override
-	public void Normalize() throws Exception {
-		x_Value /= length;
-		y_Value /= length;
-		z_Value /= length;
-		length = 1;
-	}
-
-	@Override
-	public void rotateAroundVector(Vector AxisVector, double degrees) throws Exception {
-		this.values = rotateAroundVector(this, AxisVector, degrees).values;
-	}
-
-	@Override
-	public void rotateAroundX(double degrees_around_x) throws Exception {
-
-	}
-
-	@Override
-	public void rotateAroundY(double degrees_around_y) throws Exception {
-
-	}
-
-	@Override
-	public void rotateAroundZ(double degrees) throws Exception {
-
-	}
-
-	@Override
-	public void setComponents(double x, double y, double z) {
-
-	}
+		return vs;
+	}*/
 
 
 }

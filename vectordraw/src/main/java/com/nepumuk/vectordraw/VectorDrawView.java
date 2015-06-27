@@ -16,7 +16,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.nepumuk.geocalc.Vector2;
 import com.nepumuk.geocalc.Vector3;
 
 import java.util.ArrayList;
@@ -35,7 +34,7 @@ public class VectorDrawView extends ImageView implements GestureDetector.OnGestu
 	private static final String ERROR_CONVERTING_VECTOR_TO_POINT = String.valueOf(R.string.ERROR_CONVERTING_VECTOR_TO_POINT);
 	private static final String ERROR_DRAW_TRIANGLE_INVALID_ARGUMENTS = String.valueOf(R.string.ERROR_DRAW_TRIANGLE_INVALID_ARGUMENTS);
 	private static float mScaleFactor = 1.f;
-	private static cVector cVector2 = new cVector(0, 0);
+	private static cVector cVector2 = new cVector(0, 0, 0);
 	private static touchMode tm = touchMode.Null;
 	/**
 	 * origin of the drawing
@@ -73,9 +72,9 @@ float mPreviousY;
 	private int mActivePointerId;
 	private double[] BitMapSize = new double[2];
 	// definition of the axis
-	private cVector xAxis = new cVector(new double[]{100, 0, 0}, Color.BLACK);
-	private cVector yAxis = new cVector(new double[]{0, -100, 0}, Color.BLACK);
-	private cVector zAxis = new cVector(new double[]{0, 0, 100}, Color.BLACK);
+	private cVector xAxis = new cVector(new Vector3(100, 0, 0), Color.BLACK);
+	private cVector yAxis = new cVector(new Vector3(0, -100, 0), Color.BLACK);
+	private cVector zAxis = new cVector(new Vector3(0, 0, 100), Color.BLACK);
 	// colors
 	private int backgroundColor = Color.WHITE;
 	// some factors
@@ -641,7 +640,7 @@ float mPreviousY;
 		double dy = ds[1] + d[1] / 2;
 		d[0] = dx;
 		d[1] = dy;
-		return new Vector3(dx, dy);
+		return new Vector3(dx, dy, 0);
 		//cVector2.setComponents(d);
 		//return cVector2;
 	}
@@ -724,7 +723,7 @@ float mPreviousY;
 				Vector3.multiply(vectors[1], mScaleFactor))));
 
 		// clearDraw(dada);
-		double[] zero = VectorToPoint(new Vector2(new double[]{0, 0}));
+
 		this.DrawLine(vectors[0].getvPaint(), zero, VectorToPoint(v1));
 		this.DrawLine(vectors[0].getvPaint(), zero, VectorToPoint(v2));
 		this.DrawLine(vectors[0].getvPaint(), zero, VectorToPoint(v3));
