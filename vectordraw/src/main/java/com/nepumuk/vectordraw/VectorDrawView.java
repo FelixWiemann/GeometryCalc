@@ -16,7 +16,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.nepumuk.geocalc.VectorN;
+import com.nepumuk.geocalc.Vector2;
+import com.nepumuk.geocalc.Vector3;
 
 import java.util.ArrayList;
 
@@ -277,7 +278,7 @@ float mPreviousY;
 					case Null:
 						break;
 					case RotateX:
-						for (VectorN[] vs : VectorAsQuader) {
+						for (Vector3[] vs : VectorAsQuader) {
 							try {
 								vs[0].rotateAroundX(rotationFactor * dy);
 								vs[1].rotateAroundX(rotationFactor * dy);
@@ -286,7 +287,7 @@ float mPreviousY;
 								e.printStackTrace();
 							}
 						}
-						for (VectorN[] vs : VectorsAsTriangles) {
+						for (Vector3[] vs : VectorsAsTriangles) {
 							try {
 								vs[0].rotateAroundX(rotationFactor * dy);
 								vs[1].rotateAroundX(rotationFactor * dy);
@@ -295,14 +296,14 @@ float mPreviousY;
 								e.printStackTrace();
 							}
 						}
-						for (VectorN vs : VectorAsLine) {
+						for (Vector3 vs : VectorAsLine) {
 							try {
 								vs.rotateAroundX(rotationFactor * dy);
 							} catch (Exception e) {
 								e.printStackTrace();
 							}
 						}
-						for (VectorN vs : VectorAsPoint) {
+						for (Vector3 vs : VectorAsPoint) {
 							try {
 								vs.rotateAroundX(rotationFactor * dy);
 							} catch (Exception e) {
@@ -311,7 +312,7 @@ float mPreviousY;
 						}
 						break;
 					case RotateY:
-						for (VectorN[] vs : VectorAsQuader) {
+						for (Vector3[] vs : VectorAsQuader) {
 							try {
 								vs[0].rotateAroundY(rotationFactor * dx);
 								vs[1].rotateAroundY(rotationFactor * dx);
@@ -320,7 +321,7 @@ float mPreviousY;
 								e.printStackTrace();
 							}
 						}
-						for (VectorN[] vs : VectorsAsTriangles) {
+						for (Vector3[] vs : VectorsAsTriangles) {
 							try {
 								vs[0].rotateAroundY(rotationFactor * dx);
 								vs[1].rotateAroundY(rotationFactor * dx);
@@ -329,14 +330,14 @@ float mPreviousY;
 								e.printStackTrace();
 							}
 						}
-						for (VectorN vs : VectorAsLine) {
+						for (Vector3 vs : VectorAsLine) {
 							try {
 								vs.rotateAroundY(rotationFactor * dx);
 							} catch (Exception e) {
 								e.printStackTrace();
 							}
 						}
-						for (VectorN vs : VectorAsPoint) {
+						for (Vector3 vs : VectorAsPoint) {
 							try {
 								vs.rotateAroundY(rotationFactor * dx);
 							} catch (Exception e) {
@@ -548,8 +549,8 @@ float mPreviousY;
 	 * @deprecated not yet implemented draws a circle around zero with radius v1 orthogonal to v2
 	 */
 	@SuppressWarnings("unused")
-	public void drawCircle(VectorN v1, VectorN v2) {
-		drawCircle(VectorN.origin, v1, v2);
+	public void drawCircle(Vector3 v1, Vector3 v2) {
+		drawCircle(Vector3.origin, v1, v2);
 	}
 
 	/**
@@ -560,7 +561,7 @@ float mPreviousY;
 	 * @param v3 v3
 	 */
 	@SuppressWarnings("unused")
-	public void drawCircle(VectorN v1, VectorN v2, VectorN v3) {
+	public void drawCircle(Vector3 v1, Vector3 v2, Vector3 v3) {
 		// GraphicsVectorDraw
 
 
@@ -614,7 +615,7 @@ float mPreviousY;
 	 */
 
 	@SuppressWarnings("all")
-	public double[] VectorToPoint(VectorN v) throws Exception {
+	public double[] VectorToPoint(Vector3 v) throws Exception {
 		if (v.getDimension() == 2) {
 			double[] da = {(v.getComponents()[0] + zero[0]),
 					(v.getComponents()[1] + zero[1])};
@@ -630,7 +631,7 @@ float mPreviousY;
 	 * @param v Vector to be plained
 	 * @return plained vector
 	 */
-	private VectorN plainVectorOnZ(VectorN v) {
+	private Vector3 plainVectorOnZ(Vector3 v) {
 		double[] ds = v.getComponents();
 		double dz = ds[2];
 		// plain
@@ -640,7 +641,7 @@ float mPreviousY;
 		double dy = ds[1] + d[1] / 2;
 		d[0] = dx;
 		d[1] = dy;
-		return new VectorN(dx, dy);
+		return new Vector3(dx, dy);
 		//cVector2.setComponents(d);
 		//return cVector2;
 	}
@@ -705,25 +706,25 @@ float mPreviousY;
 	public void drawQuader(cVector[] vectors) throws Exception {
 
 		cVector v1, v2, v3, v4, v5, v6, v7;
-		v1 = new cVector(plainVectorOnZ(VectorN.multiply(vectors[0], mScaleFactor)));
-		v2 = new cVector(plainVectorOnZ(VectorN.multiply(vectors[1], mScaleFactor)));
-		v3 = new cVector(plainVectorOnZ(VectorN.multiply(vectors[2], mScaleFactor)));
-		v5 = new cVector(plainVectorOnZ(VectorN.add(
-				VectorN.multiply(vectors[0], mScaleFactor),
-				VectorN.multiply(vectors[1], mScaleFactor))));
-		v6 = new cVector(plainVectorOnZ(VectorN.add(
-				VectorN.multiply(vectors[0], mScaleFactor),
-				VectorN.multiply(vectors[2], mScaleFactor))));
-		v7 = new cVector(plainVectorOnZ(VectorN.add(
-				VectorN.add(VectorN.multiply(vectors[0], mScaleFactor),
-						VectorN.multiply(vectors[1], mScaleFactor)),
-				VectorN.multiply(vectors[2], mScaleFactor))));
-		v4 = new cVector(plainVectorOnZ(VectorN.add(
-				VectorN.multiply(vectors[2], mScaleFactor),
-				VectorN.multiply(vectors[1], mScaleFactor))));
+		v1 = new cVector(plainVectorOnZ(Vector3.multiply(vectors[0], mScaleFactor)));
+		v2 = new cVector(plainVectorOnZ(Vector3.multiply(vectors[1], mScaleFactor)));
+		v3 = new cVector(plainVectorOnZ(Vector3.multiply(vectors[2], mScaleFactor)));
+		v5 = new cVector(plainVectorOnZ(Vector3.add(
+				Vector3.multiply(vectors[0], mScaleFactor),
+				Vector3.multiply(vectors[1], mScaleFactor))));
+		v6 = new cVector(plainVectorOnZ(Vector3.add(
+				Vector3.multiply(vectors[0], mScaleFactor),
+				Vector3.multiply(vectors[2], mScaleFactor))));
+		v7 = new cVector(plainVectorOnZ(Vector3.add(
+				Vector3.add(Vector3.multiply(vectors[0], mScaleFactor),
+						Vector3.multiply(vectors[1], mScaleFactor)),
+				Vector3.multiply(vectors[2], mScaleFactor))));
+		v4 = new cVector(plainVectorOnZ(Vector3.add(
+				Vector3.multiply(vectors[2], mScaleFactor),
+				Vector3.multiply(vectors[1], mScaleFactor))));
 
 		// clearDraw(dada);
-		double[] zero = VectorToPoint(new VectorN(new double[]{0, 0}));
+		double[] zero = VectorToPoint(new Vector2(new double[]{0, 0}));
 		this.DrawLine(vectors[0].getvPaint(), zero, VectorToPoint(v1));
 		this.DrawLine(vectors[0].getvPaint(), zero, VectorToPoint(v2));
 		this.DrawLine(vectors[0].getvPaint(), zero, VectorToPoint(v3));
@@ -806,7 +807,7 @@ float mPreviousY;
 		// make sure, every vector is drawn
 		try {
 			for (cVector vector : vectors) {
-				cVector v = new cVector(plainVectorOnZ(VectorN.multiply(vector, mScaleFactor)), cVector.getvPaintColor());
+				cVector v = new cVector(plainVectorOnZ(Vector3.multiply(vector, mScaleFactor)), cVector.getvPaintColor());
 
 				// finally drawVectorAsLine it
 				this.DrawLine(v.getvPaint(), zero, VectorToPoint(v));

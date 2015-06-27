@@ -11,76 +11,15 @@ package com.nepumuk.geocalc;
 @SuppressWarnings("unused")
 public class VectorN implements Vector {
 
-	/**
-	 * Vector of length 1 describing the x-axis
-	 */
 
-	public final static VectorN xAxis = new VectorN(1, 0, 0);
-	/**
-	 * Vector of length 1 describing the y-axis
-	 */
-	public final static VectorN yAxis = new VectorN(0, 1, 0);
-	/**
-	 * Vector of length 1 describing the z-axis
-	 */
-	public final static VectorN zAxis = new VectorN(0, 0, 1);
-	/**
-	 * Vector describing the origin (0,0,0)
-	 */
-	public final static VectorN origin = new VectorN(0, 0, 0);
-	protected final static String DIMENSION_ERROR = "The dimensions of both vectors are not the same, but need to be";
-	protected final static String ROTATE_ERROR_TOO_MUCH_DIMENSIONS = "can't rotate because to much dimensions";
-	protected final static String IllegalArgumentExceptionNumValZero = "you cannot divide by zero";
-	protected final static Exception exWithOutMessage = new Exception();
-	protected final static Exception exROTATE_ERROR_TOO_MUCH_DIMENSIONS = new Exception(
-			ROTATE_ERROR_TOO_MUCH_DIMENSIONS);
-	protected final static IllegalArgumentException exDIMENSION_ERROR = new IllegalArgumentException(
-			DIMENSION_ERROR);
-	protected final static IllegalArgumentException exNumValZero = new IllegalArgumentException(
-			IllegalArgumentExceptionNumValZero);
-	private final static double EqualityTolerance = Double.MIN_VALUE;
 	private static VectorN CalcResultDim3 = new VectorN(3);
 	private double[] values; // 0: x, 1:y, 2:z
 	private int dimension; // dimension of the vector
 
 	/**
-	 * constructor of a vector with two dimensions x,y
-	 *
-	 * @param x
-	 *            x-value
-	 * @param y
-	 *            y-value
-	 */
-	public VectorN(double x, double y) {
-		values = new double[2];
-		values[0] = x;
-		values[1] = y;
-		this.dimension = 2;
-
-	}
-
-	/**
-	 * constructor of a vector with three dimensions x,y,z
-	 *
-	 * @param x
-	 *            x-value
-	 * @param y
-	 *            y-value
-	 * @param z
-	 *            z-value
-	 */
-	public VectorN(double x, double y, double z) {
-		this.values = new double[3];
-		values[0] = x;
-		values[1] = y;
-		values[2] = z;
-		this.dimension = 3;
-
-	}
-
-	/**
 	 * constructor of a vector with the values of the array and array.length dimensions
-	 *
+	 * use Vector2 for a two dimensional vector instead.
+	 * use Vector3 for a three dimensional vector instead.
 	 * @param values
 	 *            array of values
 	 */
@@ -92,6 +31,8 @@ public class VectorN implements Vector {
 
 	/**
 	 * constructor of a vector based on a dimension, values are empty
+	 * use Vector2 for a two dimensional vector instead.
+	 * use Vector3 for a three dimensional vector instead.
 	 *
 	 * @param dim
 	 *            dimension the new vector should have
@@ -109,10 +50,34 @@ public class VectorN implements Vector {
 	 * @param v
 	 *            vector the new vector should be based on
 	 */
-	public VectorN(VectorN v) {
+	public VectorN(Vector v) {
 		values = v.getComponents();
 		this.dimension = v.getDimension();
 
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		// Return true if the objects are identical.
+		// (This is just an optimization, not required for correctness.)
+		if (this == o) {
+			return true;
+		}
+
+		// Return false if the other object has the wrong type.
+		// This type may be an interface depending on the interface's specification.
+		if (!(o instanceof VectorN)) {
+			return false;
+		}
+
+		// Cast to the appropriate type.
+		// This will succeed because of the instanceof, and lets us access private fields.
+		//  Vector lhs = (Vector) o;
+		return false;
+
+		// Check each field. Primitive fields, reference fields, and nullable reference
+		// fields are all treated differently.
+		//TODO
 	}
 
 	/**
@@ -121,6 +86,11 @@ public class VectorN implements Vector {
 	@Override
 	public double[] getComponents() {
 		return values;
+	}
+
+	@Override
+	public String toString() {
+		return toString(null, null);
 	}
 
 	/**
@@ -190,7 +160,7 @@ public class VectorN implements Vector {
 	 *            Vector to unify
 	 * @return unit vector of the given vector
 	 */
-	public static VectorN getUnitVector(VectorN vector) {
+	public VectorN getUnitVector(VectorN vector) {
 		// TODO optimize
 		double[] vecvals;
 		double length = vector.getLength();
@@ -231,6 +201,11 @@ public class VectorN implements Vector {
 		this.values = VectorN.Normalize(this).values;
 	}
 
+	@Override
+	public void rotateAroundVector(Vector AxisVector, double degrees) throws Exception {
+
+	}
+
 	/**
 	 * rotates the vector around the axis vector
 	 *
@@ -246,144 +221,11 @@ public class VectorN implements Vector {
 		this.values = rotateAroundVector(this, AxisVector, degrees).values;
 	}
 
-	/**
-	 * rotates a Vector around an axis described by another vector with a number
-	 * of degrees
-	 *
-	 * @param VectorToRotate
-	 *            Vector to rotate
-	 * @param AxisVector
-	 *            vector describing the axis to rotate around
-	 * @param degrees
-	 *            amount of degrees that shall be rotated
-	 * @return rotated vector
-	 * @throws Exception
-	 */
-	public static VectorN rotateAroundVector(VectorN VectorToRotate,
-											 VectorN AxisVector, double degrees) throws Exception {
-		/*
-		 * TODO optimize, evaluate whether rotation matrix is better
-		 * goal: axis
-		 * vector has to match one of the axis. we choose y-axis because reasons
-		 * first: rotate around y - axis, so that x component becomes zero
-		 * second: rotate around x - axis, so that z component becomes zero ->
-		 * the vector we rotate around becomes y
-		 */
-		double Degrees_around_y;
-		double Degrees_around_x;
-		/* how much to rotate around y that x becomes 0 */
-		Degrees_around_y = Math.atan(AxisVector.getComponents()[0]
-				/ (AxisVector.getComponents()[2] + EqualityTolerance));
-		/* catch a non-valid result and set to 0 */
-		if (Double.isNaN(Degrees_around_y)) {
-			Degrees_around_y = 0;
-		}
-		/* to rotate in the right direction, multiply with -1 */
-		Degrees_around_y *= -1;
-		/* finally rotate around y */
-		AxisVector.rotateAroundY(Degrees_around_y);
-		/* same procedure with around xAxis */
-		Degrees_around_x = Math.atan(AxisVector.getComponents()[2]
-				/ AxisVector.getComponents()[1] + EqualityTolerance);
-		if (Double.isNaN(Degrees_around_x)) {
-			Degrees_around_x = 0;
-		}
-		Degrees_around_x *= -1;
-		/* finally rotate */
-		AxisVector.rotateAroundX(Degrees_around_x);
-		/*
-		 * now that the system has a new layout, we have to match our vector to
-		 * that new layout. it should stay the same vector
-		 */
-		VectorToRotate.rotateAroundY(Degrees_around_y);
-		VectorToRotate.rotateAroundX(Degrees_around_x);
-		/*
-		 * now we can rotate it around the vector that has now the same
-		 * direction as the y axis
-		 */
-		VectorToRotate.rotateAroundY(degrees);
-		/*
-		 * we have to calculate the system back to the original one so rotate
-		 * backwards axis vector is not needed anymore, don't need to calculate
-		 * it again
-		 */
 
-		VectorToRotate.rotateAroundX(-Degrees_around_x);
-		VectorToRotate.rotateAroundY(-Degrees_around_y);
-		/* last but not least we can return this shit */
-		return VectorToRotate;
-	}
 
-	/**
-	 * rotate a 3D vector around the y axis
-	 *
-	 * @param vector
-	 *            vector to rotate
-	 * @param degrees_around_y
-	 *            amount of degrees that shall be rotated
-	 * @return rotated vector
-	 * @throws Exception
-	 */
-	public static VectorN rotateAroundY(VectorN vector, double degrees_around_y)
-			throws Exception {
-		//TODO optimize, evaluate whether rotation matrix is better
 
-		/*
-		 * check whether it is a 3 dimensional vector further comments see:
-		 * rotateAroundX
-		 */
-		if (vector.getDimension() == 3) {
-			double[] resvals, vecvals;
-			resvals = CalcResultDim3.getComponents();
-			vecvals = vector.getComponents();
-			resvals[0] = Math.sin(degrees_around_y) * vecvals[2]
-					+ Math.cos(degrees_around_y) * vecvals[0];
-			resvals[1] = vecvals[1];
-			resvals[2] = Math.cos(degrees_around_y) * vecvals[2]
-					- Math.sin(degrees_around_y) * vecvals[0];
-			CalcResultDim3.setComponents(resvals);
-			return CalcResultDim3;
-		} else {
-			// if not, BAM
-			throw exROTATE_ERROR_TOO_MUCH_DIMENSIONS;
-		}
-	}
 
-	/**
-	 * rotate a 3D vector around the x axis
-	 *
-	 * @param vector
-	 *            vector to rotate
-	 * @param degrees_around_x
-	 *            amount of degrees that shall be rotated
-	 * @return rotated vector
-	 * @throws Exception
-	 */
-	public static VectorN rotateAroundX(VectorN vector, double degrees_around_x)
-			throws Exception {
-		//TODO optimize, evaluate whether rotation matrix is better
-		/* check whether it is a 3 dimensional vector */
-		if (vector.getDimension() == 3) {
-			/* create solution vector, to be sure everything is fine */
-			double[] resvals, vecvals;
-			resvals = CalcResultDim3.getComponents();
-			vecvals = vector.getComponents();
-			/* x value stays the same */
-			resvals[0] = vecvals[0];
-			/* y value is calculated with cos*y_value+sin*z_value */
-			resvals[1] = Math.cos(degrees_around_x) * vecvals[1]
-					- Math.sin(degrees_around_x) * vecvals[2];
-			/* y value is calculated with sin*y_value+cos*z_value */
-			resvals[2] = Math.cos(degrees_around_x) * vecvals[2]
-					+ Math.sin(degrees_around_x) * vecvals[1];
-			CalcResultDim3.setComponents(resvals);
-			/* return result */
-			return CalcResultDim3;
-		} else {
-			/* if not, BAM */
-			throw exROTATE_ERROR_TOO_MUCH_DIMENSIONS;
-		}
-	}
+
 
 	/**
 	 * rotate the 3D vector around the x axis
@@ -477,7 +319,7 @@ public class VectorN implements Vector {
 	 *            vector to be summed up
 	 * @return sum of all components in the vector
 	 */
-	public static double SumComponents(VectorN vector) {
+	public double SumComponents(VectorN vector) {
 		double sum = 0;
 		double[] copms = vector.getComponents();
 		int dim = vector.getDimension();
@@ -552,6 +394,11 @@ public class VectorN implements Vector {
 		return tostring;
 	}
 
+	@Override
+	public Vector rotateAroundVector(Vector VectorToRotate, Vector AxisVector, double degrees) throws Exception {
+		return null;
+	}
+
 	// cross-product TODO
 
 	// skalar-product TODO
@@ -567,7 +414,7 @@ public class VectorN implements Vector {
 	 * @return rotated vector
 	 * @throws Exception
 	 */
-	public static VectorN rotateAroundZ(VectorN vector, double degrees)
+	public VectorN rotateAroundZ(VectorN vector, double degrees)
 			throws Exception {
 		//TODO optimize, evaluate whether rotation matrix is better
 
@@ -610,7 +457,7 @@ public class VectorN implements Vector {
 	 *            double used to multiply with vector
 	 * @return vector multiplied with double
 	 */
-	public static VectorN multiply(VectorN v, double d) {
+	public VectorN multiply(VectorN v, double d) {
 		int dim = v.getDimension();
 		if (dim == 3) {
 			double[] dims = v.getComponents();
@@ -647,7 +494,7 @@ public class VectorN implements Vector {
 	 * @throws Exception
 	 *
 	 */
-	public static VectorN Normalize(VectorN vector) throws Exception {
+	public VectorN Normalize(VectorN vector) throws Exception {
 		double length = vector.getLength();
 		if (length == 0) {
 			throw exWithOutMessage;
@@ -669,7 +516,7 @@ public class VectorN implements Vector {
 	 *            Vector to be measured
 	 * @return length of the given vector
 	 */
-	public static double getLength(VectorN vector) {
+	public double getLength(VectorN vector) {
 		return Math.sqrt(SumSquaredComponents(vector));
 	}
 
@@ -682,7 +529,7 @@ public class VectorN implements Vector {
 	 *            vector to be summed up
 	 * @return squared sum of all components
 	 */
-	public static double SumSquaredComponents(VectorN vector) {
+	public double SumSquaredComponents(VectorN vector) {
 		double squared_sum = 0;
 		double[] copms = vector.getComponents();
 		int dim = vector.getDimension();
@@ -699,7 +546,7 @@ public class VectorN implements Vector {
 	 * @param v2 Vector No 2 to compare
 	 * @return true, if identical, false if not
 	 */
-	public static boolean compareIdentical(VectorN v1, VectorN v2) {
+	public boolean compareIdentical(VectorN v1, VectorN v2) {
 		return compareIdentical(v1, v2, EqualityTolerance);
 	}
 
@@ -711,7 +558,7 @@ public class VectorN implements Vector {
 	 * @param tolerance tolerance used in comparison
 	 * @return true, if identical, false if not
 	 */
-	public static boolean compareIdentical(VectorN v1, VectorN v2,
+	public boolean compareIdentical(VectorN v1, VectorN v2,
 										   double tolerance) {
 		int dim1 = v1.getDimension();
 		// if not the same dimension -> can't be identical
@@ -739,7 +586,7 @@ public class VectorN implements Vector {
 	 * @return returns Vector with length -1
 	 * @throws Exception
 	 */
-	public static VectorN decrement(VectorN v) throws Exception {
+	public VectorN decrement(VectorN v) throws Exception {
 		return VectorN.subtract(v, VectorN.Normalize(v));
 	}
 
@@ -751,7 +598,7 @@ public class VectorN implements Vector {
 	 * @return difference
 	 * @throws Exception
 	 */
-	public static VectorN subtract(VectorN v1, VectorN v2) throws Exception {
+	public VectorN subtract(VectorN v1, VectorN v2) throws Exception {
 		// vectors need to have the same dimension
 		//TODO optimize, evaluate whether rotation matrix is better
 
@@ -776,7 +623,7 @@ public class VectorN implements Vector {
 	 * @param d used to divide the Vector
 	 * @return Vector divided by double
 	 */
-	public static VectorN divide(VectorN v, double d) {
+	public VectorN divide(VectorN v, double d) {
 		if (d == 0) {
 			/* can't divide by zero */
 			throw exNumValZero;
@@ -815,7 +662,7 @@ public class VectorN implements Vector {
 	 * @return distance between ends of the given vectors
 	 * @throws Exception
 	 */
-	public static double getDistance(VectorN v1, VectorN v2) throws Exception {
+	public double getDistance(VectorN v1, VectorN v2) throws Exception {
 		v1 = VectorN.subtract(v1, v2);
 		return v1.getLength();
 	}
@@ -828,10 +675,25 @@ public class VectorN implements Vector {
 	 * @return incremented vector
 	 * @throws Exception
 	 */
-	public static VectorN increment(VectorN v) throws Exception {
+	public VectorN increment(VectorN v) throws Exception {
 
 		return add(v, VectorN.Normalize(v));
 
+	}
+
+	@Override
+	public Vector rotateAroundX(Vector vector, double degrees_around_x) throws Exception {
+		return null;
+	}
+
+	@Override
+	public Vector rotateAroundY(Vector vector, double degrees_around_y) throws Exception {
+		return null;
+	}
+
+	@Override
+	public Vector rotateAroundZ(Vector vector, double degrees_around_z) throws Exception {
+		return null;
 	}
 
 	/**
@@ -844,7 +706,7 @@ public class VectorN implements Vector {
 	 * @return Sum of vectors
 	 * @throws Exception
 	 */
-	public static VectorN add(VectorN v1, VectorN v2) throws Exception {
+	public VectorN add(VectorN v1, VectorN v2) throws Exception {
 
 		int dim1 = v1.getDimension();
 		// both vectors need to have the same dimension!
@@ -881,7 +743,7 @@ public class VectorN implements Vector {
 	 *            vector to check
 	 * @return bool: true -> unit vector; false -> no unit vector
 	 */
-	public static Boolean IsUnitVector(VectorN v) {
+	public Boolean IsUnitVector(VectorN v) {
 		return (Math.abs(v.getLength() - 1) <= EqualityTolerance);
 	}
 
@@ -894,7 +756,7 @@ public class VectorN implements Vector {
 	 *            Vector to be multiplied
 	 * @return vector multiplied with double
 	 */
-	public static VectorN multiply(double d, VectorN v) {
+	public VectorN multiply(double d, VectorN v) {
 		/* multiply by using other method. */
 		return multiply(v, d);
 	}
@@ -906,7 +768,7 @@ public class VectorN implements Vector {
 	 * @return negated vector
 	 * @throws Exception
 	 */
-	public static VectorN negate(VectorN v) throws Exception {
+	public VectorN negate(VectorN v) throws Exception {
 		return VectorN.subtract(VectorN.subtract(v, v), v);
 	}
 
@@ -918,7 +780,7 @@ public class VectorN implements Vector {
 	 * @return rotated vectors
 	 * @throws Exception
 	 */
-	public static VectorN[] rotateAroundX(VectorN[] vs, double degrees)
+	public VectorN[] rotateAroundX(VectorN[] vs, double degrees)
 			throws Exception {
 		//TODO optimize, evaluate whether rotation matrix is better
 
@@ -940,7 +802,7 @@ public class VectorN implements Vector {
 	 * @return rotated vectors
 	 * @throws Exception
 	 */
-	public static VectorN[] rotateAroundY(VectorN[] vs, double degrees)
+	public VectorN[] rotateAroundY(VectorN[] vs, double degrees)
 			throws Exception {
 		//TODO optimize, evaluate whether rotation matrix is better
 
@@ -962,7 +824,7 @@ public class VectorN implements Vector {
 	 * @return rotated vectors
 	 * @throws Exception
 	 */
-	public static VectorN[] rotateAroundZ(VectorN[] vs, double degrees)
+	public VectorN[] rotateAroundZ(VectorN[] vs, double degrees)
 			throws Exception {
 		//TODO optimize, evaluate whether rotation matrix is better
 
@@ -981,7 +843,7 @@ public class VectorN implements Vector {
 	 * @param separator
 	 * @return
 	 */
-	public static VectorN stringToVector(String String, String form,
+	public VectorN stringToVector(String String, String form,
 										 String separator) {
 
 		String form_back;
@@ -1020,34 +882,9 @@ public class VectorN implements Vector {
 				Double.parseDouble(z_val));
 	}
 
-	@Override
-	public boolean equals(Object o) {
-		// Return true if the objects are identical.
-		// (This is just an optimization, not required for correctness.)
-		if (this == o) {
-			return true;
-		}
 
-		// Return false if the other object has the wrong type.
-		// This type may be an interface depending on the interface's specification.
-		if (!(o instanceof VectorN)) {
-			return false;
-		}
 
-		// Cast to the appropriate type.
-		// This will succeed because of the instanceof, and lets us access private fields.
-		//  Vector lhs = (Vector) o;
-		return false;
 
-		// Check each field. Primitive fields, reference fields, and nullable reference
-		// fields are all treated differently.
-		//TODO
-	}
-
-	@Override
-	public String toString() {
-		return toString(null, null);
-	}
 
 
 }

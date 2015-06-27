@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">geoCalc</string>
+    <string name="CANT_CHANGE_DIMENSION_USE_OTHER_VECTOR_INSTEAD">CANT_CHANGE_DIMENSION_USE_OTHER_VECTOR_INSTEAD</string>
 </resources>
