@@ -5,7 +5,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 
 import com.nepumuk.geocalc.Vector;
-import com.nepumuk.geocalc.VectorN;
+import com.nepumuk.geocalc.Vector3;
 
 
 /**
@@ -14,7 +14,7 @@ import com.nepumuk.geocalc.VectorN;
  * @author Felix "nepumuk" Wiemann
  * @version 0.1
  */
-public class cVector extends VectorN implements Vector {
+public class cVector extends Vector3 implements Vector {
 	// nobody needs colored shit if he doesn't want to draw them
 	// therefore I introduce a class that extends the Vector class and is able to hold the colors.
 	public static int ColorStandard = Color.BLACK;
@@ -76,6 +76,20 @@ public class cVector extends VectorN implements Vector {
 	}
 
 
+	/**
+	 * constructor of an vector with three dimensions x,y,z
+	 *
+	 * @param x x-value
+	 * @param y y-value
+	 * @param z z-value
+	 */
+	@SuppressWarnings("unused")
+	public cVector(double x, double y, double z) {
+		super(x, y, z);
+		initPaint();
+
+	}
+
 	/*public cVector(double x, double y, double z) {
 		super(x, y, z);
 		initPaint();
@@ -89,11 +103,12 @@ public class cVector extends VectorN implements Vector {
 		this.changePaintColor(Color);
 	}*/
 	@SuppressWarnings("unused")
-	public cVector(double x, double y) {
+	/*public cVector(double x, double y) {
+
 		super(x, y);
 		initPaint();
 
-	}
+	}*/
 
 	/**
 	 * initialize the Paint the vector can be drawn with
@@ -109,71 +124,38 @@ public class cVector extends VectorN implements Vector {
 		vPaint.setStrokeWidth(cVector.PaintStrokeWidthStandard);
 	}
 
-	/**
-	 * constructor of an vector with three dimensions x,y,z
-	 *
-	 * @param x x-value
-	 * @param y y-value
-	 * @param z z-value
-	 */
-	@SuppressWarnings("unused")
-	public cVector(double x, double y, double z) {
-		super(x, y, z);
-		initPaint();
-
-	}
-
 
 	/**
 	 * constructor with an array of values
 	 *
-	 * @param values
+	 * @param //values
 	 *            array of values
 	 */
 	@SuppressWarnings("unused")
-	public cVector(double[] values) {
+	/*public cVector(double[] values) {
 		super(values);
 		initPaint();
-	}
+	}*/
 
 	/**
 	 * constructor with an array of values
 	 *
-	 * @param values
+	 * @param// values
 	 *            array of values
-	 */
+	 *//*
 	public cVector(double[] values, int Color) {
 		super(values);
 		initPaint();
 		this.changePaintColor(Color);
-	}
+	}*/
 
-	/**
-	 * constructor of an vector based on a dimension
-	 *
-	 * @param dim
-	 *            dimension the new vector should have
-	 */
-	@SuppressWarnings("unused")
-	public cVector(int dim) {
-		super(dim);
-		initPaint();
 
-	}
-
-	public cVector(int dim, int Color) {
-		super(dim);
-		initPaint();
-		this.changePaintColor(Color);
-
-	}
-
-	public cVector(VectorN v) {
+	public cVector(Vector3 v) {
 		super(v);
 		initPaint();
 	}
 
-	public cVector(VectorN v, int Color) {
+	public cVector(Vector3 v, int Color) {
 		super(v);
 		initPaint();
 		this.changePaintColor(Color);
